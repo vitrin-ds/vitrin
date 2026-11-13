@@ -1,0 +1,32 @@
+{
+  "$doc": "Presets: a theme's character per brand or sector. Only what differs from the base tokens is listed: the primary ramp (11 steps, from src/lib/theme-editor/ramp.ts so the curve matches Figma's), the sans font (a family loaded by src/lib/fonts.ts) and the radius roles. scripts/build-tokens.py turns these into [data-preset] blocks in tokens.css; src/lib/presets reads the same file for the Themes page and the contrast test.",
+  "presets": {
+    "things": {
+      "theme": "multibrand",
+      "sector": "beauty"
+    },
+    "lunara": {
+      "theme": "single-brand",
+      "sector": "beauty"
+    },
+    "burrowly": {
+      "theme": "single-brand",
+      "sector": "pet",
+      "primary": {
+        "50": "#f8f9f6",
+        "100": "#eff2eb",
+        "200": "#dee4d6",
+        "300": "#c4cfb5",
+        "400": "#a2b38a",
+        "500": "#7e945e",
+        "600": "#687e47",
+        "700": "#4b5d2e",
+        "800": "#3e4c27",
+        "900": "#354024",
+        "950": "#1c250e"
+      },
+      "font": "nunito",
+      "radius": { "control": 12, "card": 16, "surface": 24, "overlay": 16 }
+    }
+  }
+}

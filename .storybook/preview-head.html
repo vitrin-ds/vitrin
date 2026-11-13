@@ -1,0 +1,25 @@
+<style>
+  /* Docs: a plain border instead of Storybook's drop shadows. */
+  .sbdocs .sb-anchor > div,
+  .sbdocs .docs-story,
+  .sbdocs [class*="css-"]:has(> .docs-story) {
+    box-shadow: none !important;
+  }
+  .sbdocs .docblock-argstable tbody {
+    filter: none !important;
+    box-shadow: none !important;
+  }
+  .sbdocs .docblock-argstable tbody tr {
+    box-shadow: none !important;
+  }
+  /* Long prop types wrap instead of pushing the table off the page. */
+  .sbdocs .docblock-argstable {
+    table-layout: fixed;
+    width: 100%;
+  }
+  .sbdocs .docblock-argstable td,
+  .sbdocs .docblock-argstable th {
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+</style>

@@ -1,0 +1,213 @@
+/* Vitrin global stylesheet — import once in app/layout.tsx */
+@import "tailwindcss";
+@import "./tokens.css";   /* generated: CSS custom properties (primitives, semantic light/dark, responsive type) */
+@import "./theme.css";    /* generated: Tailwind v4 @theme mapping */
+
+/* Dark mode is driven by <html data-theme="dark">, not prefers-color-scheme */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@layer base {
+  html { font-family: var(--th-font-sans); color: var(--th-text-primary); background: var(--th-bg-primary); }
+  /* Rails that bleed to the viewport edge (rail-bleed) reach 100vw, which counts a classic
+     scrollbar: clip that sliver instead of letting the page scroll sideways (clip keeps sticky). */
+  body { overflow-x: clip; }
+  :focus-visible { outline: none; }
+}
+
+/* Page grid: 4 / 6 / 12 columns, gutter 8, margin 16 / 16 / 40 — mirrors the Figma layout-grid styles 375 / 744 / 1440 */
+@utility page-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--th-grid-columns), minmax(0, 1fr));
+  column-gap: var(--th-grid-gutter);
+  padding-inline: var(--th-grid-margin);
+  max-width: 1440px;
+  margin-inline: auto;
+}
+
+/* Icon: Material Symbols Rounded ligatures (see components/ui/icon). Size, weight and fill
+   are set by the icon-* utilities below so the Icon component stays class-only. */
+@utility icon {
+  display: inline-block;
+  flex-shrink: 0;
+  overflow: hidden;
+  font-family: var(--font-icon);
+  font-weight: normal;
+  font-style: normal;
+  font-size: var(--icon-size, var(--th-icon-size-md));
+  line-height: 1;
+  width: 1em;
+  height: 1em;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+  direction: ltr;
+  font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  font-variation-settings:
+    "FILL" var(--icon-fill, 0),
+    "wght" var(--icon-weight, 400),
+    "GRAD" 0,
+    "opsz" var(--icon-opsz, 20);
+  /* The ligature comes from generated content, not a text node: screen readers, axe's text
+     contrast rule, find-in-page and copy/paste never see "arrow_back". */
+  &::before { content: attr(data-icon); }
+}
+/* Icon `opticalSize={24}` (the 24-grid glyph in a 16 / 20px box). Outside the utility layer, so
+   it wins over the size utilities that set the default optical size. */
+.icon[data-opsz="24"] { --icon-opsz: 24; }
+/* Until the page has painted after `load` (src/components/ui/icon/icon-font.ts): an empty 1em
+   box, so the icon font isn't requested ahead of the LCP resources. */
+:root[data-icons="deferred"] .icon::before { content: none; }
+
+/* A returning visitor's stored cookie choice (src/components/patterns/cookie-consent/
+   consent-init-script.ts): the server-rendered Cookie Banner stays hidden until React has read
+   the choice and removed it. */
+:root[data-consent="stored"] [data-cookie-banner][data-state="loading"] { display: none; }
+
+/* Component sizes with no Icon token yet (a component's own dimensions use the
+   Figma value): 8px in Label, 16px in Chip. */
+@utility icon-8 { --icon-size: 8px; --icon-opsz: 20; }
+@utility icon-16 { --icon-size: 16px; --icon-opsz: 20; }
+@utility icon-24 { --icon-size: 24px; --icon-opsz: 24; }
+@utility icon-32 { --icon-size: 32px; --icon-opsz: 28; }
+@utility icon-sm { --icon-size: var(--th-icon-size-sm); --icon-opsz: 20; }
+@utility icon-md { --icon-size: var(--th-icon-size-md); --icon-opsz: 20; }
+@utility icon-lg { --icon-size: var(--th-icon-size-lg); --icon-opsz: 28; }
+@utility icon-xl { --icon-size: var(--th-icon-size-xl); --icon-opsz: 40; }
+@utility icon-2xl { --icon-size: var(--th-icon-size-2xl); --icon-opsz: 48; }
+@utility icon-filled { --icon-fill: 1; }
+@utility icon-light { --icon-weight: 200; }
+
+/* Image scrims (Figma Card.Category.Vertical.Featured): black 60% → 0 behind text-on-image.
+   The scrim is the text block's own background, full bleed: 60% behind the text, fading to 0 over
+   the block's 40px padding away from the edge, so it grows with the text (a two-line title) and
+   white text stays ≥ 4.5:1 on any photo, even a white one (5.74:1). Black at 60% has no primitive
+   (black/500 is 50%, black/600 80%), so it is mixed from black/1000. */
+@utility scrim-top {
+  background-image: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--th-black-1000) 60%, transparent) calc(100% - 40px),
+    transparent
+  );
+}
+@utility scrim-bottom {
+  background-image: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--th-black-1000) 60%, transparent) calc(100% - 40px),
+    transparent
+  );
+}
+
+/* Figma colour style "Add Image": the stand-in for a missing image. A neutral/50 fill with the
+   add_a_photo glyph (primary/400 at 20%) tiled every 36px, exported from the Figma pattern to
+   public/brand/add-image.svg. The SVG has no viewBox, so it takes the box's size and the tile
+   stays 36px at any size (as a background here, or as a mock image's src). Same in both themes,
+   like the style. */
+@utility add-image {
+  background-color: var(--th-neutral-50);
+  background-image: url("/brand/add-image.svg");
+}
+
+/* Card.Product.Vertical.Featured `Bottom`: Figma fills it with rgba(54,10,82,.1) under an 8px
+   blur. That tint has no Figma variable yet (an open point in Figma); the nearest
+   primitive, primary/950, at 10% stands in. */
+@utility featured-glass {
+  background-color: color-mix(in srgb, var(--th-primary-950) 10%, transparent);
+}
+
+/* Card rail on the page width (CardRail layout="page", in a page-grid's full span): the list
+   reaches the viewport edges, so cards scrolled past the content column stay visible on both
+   sides. Its inline padding and scroll padding equal the distance from the viewport edge to the
+   content: the grid margin, plus half of what the viewport has beyond the grid's 1440 max width.
+   The first and last cards line up with the column and snap there. */
+@utility rail-bleed {
+  --rail-inset: max(var(--th-grid-margin), calc((100vw - 1440px) / 2 + var(--th-grid-margin)));
+  margin-inline: calc(-1 * var(--rail-inset));
+  padding-inline: var(--rail-inset);
+  scroll-padding-inline: var(--rail-inset);
+}
+
+/* Hides a scroller's own scrollbar where another control shows the position (card rails: the
+   Slider Pagination Bar). It still scrolls by touch, trackpad, wheel and keyboard focus. */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Five cards across the content width, with the rail's 8px gaps (Home New Arrivals, Daily Edit). */
+@utility rail-item-fifth {
+  width: calc((100% - 4 * var(--spacing) * 8) / 5);
+}
+
+/* Six across (PDP "You may also like", Figma 220 at 1440). */
+@utility rail-item-sixth {
+  width: calc((100% - 5 * var(--spacing) * 8) / 6);
+}
+
+
+
+/* Figma Link underline: dotted, 7% of the font size, no skip-ink. Always on (Link Do/Don't). */
+@utility link-underline {
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-thickness: 0.07em;
+  text-decoration-skip-ink: none;
+}
+
+
+
+/* Overlay motion (Figma overlay rule, Faz 2c review): enter 200ms ease-out, exit 150ms ease-in.
+   Dialog fades and scales from 0.96, sheets slide in from their edge, the scrim fades. The state
+   comes from data-state="open|closed" on the element. No motion with reduced motion. Keep the
+   durations in sync with OVERLAY_EXIT_MS (base-modal.tsx). */
+@keyframes th-fade-in { from { opacity: 0; } }
+@keyframes th-fade-out { to { opacity: 0; } }
+@keyframes th-dialog-in { from { opacity: 0; transform: scale(0.96); } }
+@keyframes th-dialog-out { to { opacity: 0; transform: scale(0.96); } }
+@keyframes th-slide-in-bottom { from { transform: translateY(100%); } }
+@keyframes th-slide-out-bottom { to { transform: translateY(100%); } }
+@keyframes th-slide-in-right { from { transform: translateX(100%); } }
+@keyframes th-slide-out-right { to { transform: translateX(100%); } }
+
+@utility motion-overlay {
+  @media (prefers-reduced-motion: no-preference) {
+    &[data-state="open"] { animation: th-fade-in 200ms ease-out; }
+    &[data-state="closed"] { animation: th-fade-out 150ms ease-in forwards; }
+  }
+}
+@utility motion-dialog {
+  @media (prefers-reduced-motion: no-preference) {
+    &[data-state="open"] { animation: th-dialog-in 200ms ease-out; }
+    &[data-state="closed"] { animation: th-dialog-out 150ms ease-in forwards; }
+  }
+}
+@utility motion-sheet-bottom {
+  @media (prefers-reduced-motion: no-preference) {
+    &[data-state="open"] { animation: th-slide-in-bottom 200ms ease-out; }
+    &[data-state="closed"] { animation: th-slide-out-bottom 150ms ease-in forwards; }
+  }
+}
+@utility motion-sheet-right {
+  @media (prefers-reduced-motion: no-preference) {
+    &[data-state="open"] { animation: th-slide-in-right 200ms ease-out; }
+    &[data-state="closed"] { animation: th-slide-out-right 150ms ease-in forwards; }
+  }
+}
+
+/*
+ * Single-colour brand logos (Figma Icons `s-*` Solid, bound to icon-primary): the file in
+ * public/brand/social is used as a mask and painted with the text colour, so the logo follows
+ * the theme (e.g. Apple turns light in dark mode). Not inline SVG; never recoloured per page.
+ */
+@utility brand-mask {
+  background-color: currentColor;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}
+@utility brand-mask-apple {
+  mask-image: url("/brand/social/apple.svg");
+}

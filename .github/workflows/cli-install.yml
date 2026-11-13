@@ -1,0 +1,111 @@
+# Installs from the registry into a fresh Next.js project, the way a user would. The registry is
+# built from this commit and served locally, so the test doesn't depend on what is live.
+# - install: Mini Cart on Windows, with the files and the licence line checked.
+# - install-all: every registry item on Linux, into a project with create-next-app's defaults
+#   (cacheComponents on), then type check, build, and open every connected block in Chromium to
+#   do its main action with no setup (scripts/test-install-all.mjs).
+
+name: CLI install
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  install:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Build the registry
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm registry
+
+      - name: Serve the registry
+        run: |
+          Start-Process node -ArgumentList "scripts/serve-registry.mjs","public/r","4790" -WindowStyle Hidden
+          Start-Sleep -Seconds 2
+          (Invoke-WebRequest http://127.0.0.1:4790/index.json).StatusCode
+
+      - name: Create a Next.js project
+        working-directory: ${{ runner.temp }}
+        run: npx --yes create-next-app@16 shop --ts --tailwind --eslint --app --src-dir --import-alias "@/*" --use-npm --no-turbopack --disable-git --yes
+
+      - name: Add Mini Cart with the CLI
+        working-directory: ${{ runner.temp }}/shop
+        run: node "${{ github.workspace }}/cli/bin/vitrin.mjs" add mini-cart --registry http://127.0.0.1:4790
+
+      - name: Check the installed files
+        working-directory: ${{ runner.temp }}/shop
+        run: |
+          $notice = "Vitrin (https://vitrin.design) · MIT License"
+          $files = @(
+            "src/components/patterns/mini-cart/mini-cart.tsx",
+            "src/styles/vitrin/tokens.css",
+            "src/styles/vitrin/material-symbols-rounded.woff2",
+            "src/styles/vitrin/material-symbols-LICENSE.txt",
+            "public/vitrin/add-image.svg",
+            "vitrin.json"
+          )
+          foreach ($file in $files) {
+            if (-not (Test-Path $file)) { throw "Missing: $file" }
+          }
+          foreach ($file in @("src/components/patterns/mini-cart/mini-cart.tsx", "src/styles/vitrin/tokens.css")) {
+            $first = Get-Content $file -TotalCount 1 -Encoding utf8
+            if (-not $first.Contains($notice)) { throw "No licence line in $file" }
+          }
+          if (-not (Select-String -Path src/app/globals.css -Pattern "styles/vitrin/tokens.css" -SimpleMatch -Quiet)) {
+            throw "globals.css doesn't import the Vitrin styles"
+          }
+
+      - name: Type-check and build the project
+        working-directory: ${{ runner.temp }}/shop
+        run: |
+          npx tsc --noEmit
+          npm run build
+
+  install-all:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Build and serve the registry
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm exec playwright install --with-deps chromium
+          pnpm registry
+          node scripts/serve-registry.mjs public/r 4790 &
+          sleep 2
+          curl -fsS http://127.0.0.1:4790/index.json > /dev/null
+
+      - name: Create a Next.js project with the defaults
+        working-directory: ${{ runner.temp }}
+        run: npx --yes create-next-app@16 shop --ts --tailwind --eslint --app --src-dir --import-alias "@/*" --use-npm --no-turbopack --disable-git --yes
+
+      - name: Install every item, type-check, build and run the connected blocks
+        run: node scripts/test-install-all.mjs "${{ runner.temp }}/shop" --registry http://127.0.0.1:4790

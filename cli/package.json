@@ -1,0 +1,27 @@
+{
+  "name": "@vitrin-ds/cli",
+  "version": "0.2.0",
+  "description": "Adds Vitrin components and commerce blocks to a Next.js project.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vitrin-ds/vitrin.git",
+    "directory": "cli"
+  },
+  "homepage": "https://vitrin.design",
+  "bugs": {
+    "url": "https://github.com/vitrin-ds/vitrin/issues"
+  },
+  "type": "module",
+  "bin": {
+    "vitrin": "bin/vitrin.mjs"
+  },
+  "files": [
+    "bin",
+    "src",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  }
+}
