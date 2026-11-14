@@ -22,6 +22,17 @@ export default defineConfig({
         },
       },
       {
+        // pnpm vitrin:snippets: writes the usage code of the stories (scripts/vitrin-docs).
+        plugins: [react()],
+        resolve: { tsconfigPaths: true },
+        test: {
+          name: "docs",
+          environment: "jsdom",
+          include: ["scripts/vitrin-docs/*.run.tsx"],
+          setupFiles: ["./vitest.setup.ts"],
+        },
+      },
+      {
         extends: true,
         plugins: [storybookTest({ configDir: path.join(dirname, ".storybook") })],
         test: {

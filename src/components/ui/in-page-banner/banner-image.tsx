@@ -13,7 +13,7 @@ import { BandAction, type BandActionProps } from "../cta-band/band-action";
 // - `Banner [Image Background / Compact]` (BannerImageBackgroundCompact): 400 tall, copy left-aligned, padding
 //   40 (20 on mobile), optional sale tag (Figma `Show Sticker`): a Label (accent) top-right at 20.
 // - `Banner [Image - Centered]` (BannerImageCentered): 560 tall (440 on mobile), copy and button
-//   centred. Home 07 uses it for the Sale Banner (448 × 675) with a SaleCountdown (sayfa düzeyi, children olarak) in `children`.
+//   centred. Home 07 uses it for the Sale Banner (448 × 675) with a sale countdown (a page-level component) in `children`.
 // - `Banner.Horizontal` (BannerHorizontal): the Compact banner as one link (Home 07 "Banner
 //   Tower"); Hover draws a 4px surface-primary frame inside the banner and underlines the title.
 //   No scrim, as in Figma: overline text-accent and title text-primary straight on the photo.
@@ -167,7 +167,7 @@ export function BannerImageBackgroundCompact({
 export interface BannerImageCenteredProps extends BannerImageBaseProps {
   /** Figma `Button` (`Show Button`). */
   action?: BandActionProps;
-  /** Extra copy under the title, e.g. a SaleCountdown (sayfa düzeyi, children olarak) (Home 07 Sale Banner). */
+  /** Extra copy under the title, e.g. a sale countdown. */
   children?: ReactNode;
 }
 
@@ -204,7 +204,7 @@ export function BannerImageCentered({
 export interface BannerSaleProps extends BannerImageBaseProps {
   /** Figma `Button` ("Shop The Sale"). */
   action?: BandActionProps;
-  /** The SaleCountdown (sayfa düzeyi, children olarak) under the title. */
+  /** Extra copy under the title, e.g. a sale countdown. */
   children?: ReactNode;
 }
 
@@ -212,7 +212,7 @@ export interface BannerSaleProps extends BannerImageBaseProps {
  * Figma Home 07 `Sale Banner` (30198:193347): radius 8, the image fills it, padding 40 · 48
  * (Figma 47, off the spacing scale), copy at the top and the button at the bottom
  * (space-between), all centred. Copy (gap 12): overline title-medium, title display-small, then
- * the SaleCountdown (sayfa düzeyi, children olarak; display-small, `children`), in text-on-image straight on the photo: no scrim, as
+ * the sale countdown (a page-level component in `children`, display-small), in text-on-image straight on the photo: no scrim, as
  * in Figma. Button: Outline Large Pill, at least 216 wide (full width below 744px).
  */
 export function BannerSale({

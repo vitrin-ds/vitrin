@@ -293,6 +293,6 @@ name are described in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ## Links
 
-- Components and their states: <https://vitrin.design/storybook/>
+- Every component and block, with a live preview, code and props: <https://vitrin.design/components>
 - Demo store: <https://demo.vitrin.design>
 - Ready-made stores (themes) and the agency licence: <https://vitrin.design/pricing>

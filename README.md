@@ -6,7 +6,7 @@ this repository are free, and ready-made stores built from them are sold at
 
 - **Demo store:** <https://demo.vitrin.design>
 - **Components, blocks and pricing:** <https://vitrin.design>
-- **Storybook** (every component, its variants and states): <https://vitrin.design/storybook/>
+- **Every component and block** (live preview, code, props): <https://vitrin.design/components>
 - **Install guide:** [cli/README.md](cli/README.md)
 
 ## Install

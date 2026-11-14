@@ -19,16 +19,35 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    // A preset's character on the whole story (tokens/presets.json); vitrin.design's previews set
+    // it from the URL (`&globals=preset:burrowly`).
+    preset: {
+      description: "Preset (<html data-preset>)",
+      toolbar: {
+        title: "Preset",
+        icon: "paintbrush",
+        items: [
+          { value: "things", title: "Things" },
+          { value: "lunara", title: "lunara" },
+          { value: "burrowly", title: "burrowly" },
+        ],
+        dynamicTitle: true,
+      },
+    },
   },
-  initialGlobals: { theme: "light" },
+  initialGlobals: { theme: "light", preset: "things" },
   decorators: [
     (Story, context) => {
       const theme = context.globals.theme === "dark" ? "dark" : "light";
+      const preset = typeof context.globals.preset === "string" ? context.globals.preset : "things";
       useEffect(() => {
         const root = document.documentElement;
         root.setAttribute("data-theme", theme);
+        // On <html>, so dialogs and sheets portalled to <body> take the preset too.
+        if (preset === "things") root.removeAttribute("data-preset");
+        else root.setAttribute("data-preset", preset);
         root.classList.add(...fontVariables.split(" "));
-      }, [theme]);
+      }, [theme, preset]);
       return (
         <div className="bg-bg-primary text-text-primary">
           <Story />
